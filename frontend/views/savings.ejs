@@ -1,0 +1,16 @@
+<section>
+  <h2>Savings Goals</h2>
+  <% if (error) { %>
+    <p>Error: <%= error %></p>
+  <% } else if (savings && savings.length > 0) { %>
+    <ul>
+      <% savings.forEach(goal => { %>
+        <li>
+          <%= goal.name %>: Target $<%= goal.targetAmount %>, Current $<%= goal.currentAmount %>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <p>No savings goals found.</p>
+  <% } %>
+</section>
