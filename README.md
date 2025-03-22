@@ -27,5 +27,5 @@ Follow these steps to set up and run the project:
    ```
 6. Start the frontend project with:
    ```sh
-   npm start
+   node app.js
    ```
