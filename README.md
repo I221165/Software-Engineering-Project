@@ -11,14 +11,21 @@ To run this project, ensure you have the following installed:
 ## How to Run
 Follow these steps to set up and run the project:
 
-1. Open a terminal in the project directory.
-2. Install dependencies by running:
+1. Open a terminal in the project->backend directory.
+2. Install dependencies for backend by running:
    ```sh
    npm install
    ```
-3. Start the application with:
+3. Start the backend api with:
    ```sh
    node app.js
    ```
-
-Make sure you have an **active MongoDB connection** before running the application.
+4. Change directory to project->frontend in another terminal.
+5. Install dependencies for frontend by running:
+   ```sh
+   npm install
+   ```
+6. Start the frontend project with:
+   ```sh
+   npm start
+   ```

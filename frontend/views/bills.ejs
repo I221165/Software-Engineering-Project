@@ -1,0 +1,16 @@
+<section>
+  <h2>Bills</h2>
+  <% if (error) { %>
+    <p>Error: <%= error %></p>
+  <% } else if (bills && bills.length > 0) { %>
+    <ul>
+      <% bills.forEach(bill => { %>
+        <li>
+          <%= bill.name %> - $<%= bill.amount %> (<%= bill.isRecurring ? 'Recurring' : 'One-time' %>)
+        </li>
+      <% }); %>
+    </ul>
+  <% } else { %>
+    <p>No bills found.</p>
+  <% } %>
+</section>

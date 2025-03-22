@@ -1,0 +1,27 @@
+<section>
+  <h2>Reports</h2>
+  <% if (error) { %>
+    <p>Error: <%= error %></p>
+  <% } else if (summary && summary.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Total Amount</th>
+          <th>Transaction Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% summary.forEach(item => { %>
+          <tr>
+            <td><%= item._id %></td>
+            <td><%= item.totalAmount %></td>
+            <td><%= item.count %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No report data available.</p>
+  <% } %>
+</section>
