@@ -13,7 +13,12 @@ export default function Home() {
   useEffect(() => {
     const user = getCurrentUser()
     if (user) {
-      router.push("/dashboard")
+      // Redirect based on user role
+      if (user.role === "loanDistributor") {
+        router.push("/loan-distributor")
+      } else {
+        router.push("/dashboard")
+      }
     }
   }, [router])
 

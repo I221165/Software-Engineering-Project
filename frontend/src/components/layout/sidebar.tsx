@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -15,9 +15,12 @@ import {
   Menu,
   X,
   LogOut,
+  FileText,
+  Calculator,
+  Bell,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { logout } from "@/services/authService"
+import { logout, getCurrentUser } from "@/services/authService"
 
 interface SidebarProps {
   onLogout: () => void
@@ -26,6 +29,14 @@ interface SidebarProps {
 export function Sidebar({ onLogout }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    const user = getCurrentUser()
+    if (user) {
+      setUserRole(user.role)
+    }
+  }, [])
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
@@ -36,15 +47,29 @@ export function Sidebar({ onLogout }: SidebarProps) {
     onLogout()
   }
 
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
-    { href: "/budget", label: "Budget", icon: PieChart },
-    { href: "/bills", label: "Bills", icon: Receipt },
-    { href: "/savings", label: "Savings", icon: PiggyBank },
-    { href: "/loans", label: "Loans", icon: BanknoteIcon },
-    { href: "/settings", label: "Settings", icon: Settings },
-  ]
+  // Define navigation items based on user role
+  let navItems = []
+  
+  if (userRole === "loanDistributor") {
+    // Only show relevant items for loan distributors
+    navItems = [
+      { href: "/loan-distributor", label: "Loan Applications", icon: FileText },
+      { href: "/loan-distributor/tax-calculator", label: "Tax Calculator", icon: Calculator },
+      { href: "/loan-distributor/notifications", label: "Notifications", icon: Bell },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ]
+  } else {
+    // Regular user navigation items
+    navItems = [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
+      { href: "/budget", label: "Budget", icon: PieChart },
+      { href: "/bills", label: "Bills", icon: Receipt },
+      { href: "/savings", label: "Savings", icon: PiggyBank },
+      { href: "/loans", label: "Loans", icon: BanknoteIcon },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ]
+  }
 
   return (
     <>
@@ -90,12 +115,12 @@ export function Sidebar({ onLogout }: SidebarProps) {
 
           <div className="p-4 border-t border-emerald/20">
             <Button
-              variant="outline"
-              className="w-full justify-start text-off-white hover:text-emerald"
+              variant="ghost"
+              className="w-full flex items-center justify-start text-off-white hover:bg-charcoal"
               onClick={handleLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Log Out
+              <LogOut className="mr-3 h-5 w-5" />
+              Logout
             </Button>
           </div>
         </div>

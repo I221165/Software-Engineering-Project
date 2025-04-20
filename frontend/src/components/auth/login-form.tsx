@@ -37,8 +37,14 @@ export function LoginForm() {
     setError(null)
 
     try {
-      await login(values.email, values.password)
-      router.push("/dashboard")
+      const user = await login(values.email, values.password)
+      
+      // Redirect based on user role
+      if (user.role === "loanDistributor") {
+        router.push("/loan-distributor")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err) {
       setError("Invalid email or password")
     } finally {
@@ -99,7 +105,9 @@ export function LoginForm() {
       <div className="text-center text-sm">
         <p className="text-muted-foreground">For demo, use:</p>
         <p className="text-xs text-muted-foreground">
-          Email: john@example.com
+          Email: loan@example.com (Loan Distributor)
+          <br />
+          Email: john@example.com (Regular User)
           <br />
           Password: any password will work
         </p>

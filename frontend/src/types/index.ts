@@ -2,7 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
-  role: "regular" | "premium" | "admin" | "bank_manager" | "loan_distributor" | "financial_advisor"
+  role: "regular" | "premium" | "admin" | "loanDistributor" | "bank_manager" | "financial_advisor"
 }
 
 export interface Transaction {
@@ -49,10 +49,28 @@ export interface SavingsGoal {
 export interface LoanApplication {
   id: string
   userId: string
+  userName: string
   amount: number
+  purpose: string
   status: "pending" | "approved" | "rejected"
-  tax: number
-  createdAt: Date
+  submittedDate: string
+  creditScore: number
+  financialHistory: {
+    monthlyIncome: number
+    monthlyExpenses: number
+    savings: number
+    existingLoans: number
+    paymentHistory: string
+  }
+}
+
+export interface Notification {
+  id: string
+  title: string
+  message: string
+  recipient: string
+  date: string
+  read: boolean
 }
 
 export interface AuthState {
@@ -80,4 +98,11 @@ export interface ChartData {
     borderColor: string[]
     borderWidth: number
   }[]
+}
+
+export interface TaxCalculation {
+  principal: number
+  taxRate: number
+  taxAmount: number
+  netAmount: number
 }

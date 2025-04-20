@@ -20,6 +20,12 @@ const dummyUsers: User[] = [
     email: "admin@example.com",
     role: "admin",
   },
+  {
+    id: "4",
+    name: "Loan Distributor",
+    email: "loan@example.com",
+    role: "loanDistributor",
+  },
 ]
 
 // Simulate login
