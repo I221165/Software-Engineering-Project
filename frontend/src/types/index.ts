@@ -2,7 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
-  role: "regular" | "premium" | "admin" | "loanDistributor" | "bank_manager" | "financial_advisor"
+  role: "regular" | "premium" | "admin" | "loanDistributor" | "bankManager" | "financial_advisor"
 }
 
 export interface Transaction {
@@ -106,3 +106,5 @@ export interface TaxCalculation {
   taxAmount: number
   netAmount: number
 }
+
+export type UserRole = "regular" | "premium" | "admin" | "loanDistributor" | "bankManager" | "financial_advisor";

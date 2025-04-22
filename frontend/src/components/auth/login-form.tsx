@@ -2,29 +2,24 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { login } from "@/services/authService"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(1, { message: "Password is required" }),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 })
 
-type FormValues = z.infer<typeof formSchema>
-
 export function LoginForm() {
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -32,85 +27,89 @@ export function LoginForm() {
     },
   })
 
-  const onSubmit = async (values: FormValues) => {
-    setIsLoading(true)
-    setError(null)
-
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setLoading(true)
+      setError(null)
       const user = await login(values.email, values.password)
       
-      // Redirect based on user role
-      if (user.role === "loanDistributor") {
-        router.push("/loan-distributor")
-      } else {
-        router.push("/dashboard")
+      // Role-based redirection
+      if (user) {
+        switch (user.role) {
+          case "admin":
+            router.push("/admin")
+            break
+          case "bankManager":
+            router.push("/client-summaries")
+            break
+          case "loanDistributor":
+            router.push("/loan-distributor")
+            break
+          case "financial_advisor":
+            router.push("/advisor")
+            break
+          case "premium":
+            router.push("/premium/dashboard")
+            break
+          default:
+            router.push("/dashboard")
+        }
       }
     } catch (err) {
+      console.error("Login error:", err)
       setError("Invalid email or password")
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">Enter your credentials to sign in to your account</p>
-      </div>
-
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="your.email@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+    <div className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-2">
+          <Input
+            placeholder="Email"
+            type="email"
+            {...form.register("email")}
+            disabled={loading}
           />
+          {form.formState.errors.email && (
+            <p className="text-sm text-red-500">
+              {form.formState.errors.email.message}
+            </p>
+          )}
+        </div>
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }: any) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+        <div className="space-y-2">
+          <Input
+            placeholder="Password"
+            type="password"
+            {...form.register("password")}
+            disabled={loading}
           />
+          {form.formState.errors.password && (
+            <p className="text-sm text-red-500">
+              {form.formState.errors.password.message}
+            </p>
+          )}
+        </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-      </Form>
+        {error && <p className="text-sm text-red-500">{error}</p>}
 
-      <div className="text-center text-sm">
-        <p className="text-muted-foreground">For demo, use:</p>
-        <p className="text-xs text-muted-foreground">
-          Email: loan@example.com (Loan Distributor)
-          <br />
-          Email: john@example.com (Regular User)
-          <br />
-          Password: any password will work
-        </p>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </Button>
+      </form>
+
+      <div className="text-sm text-gray-500">
+        <p>Demo credentials:</p>
+        <ul className="list-disc list-inside mt-1">
+          <li>Regular User: john@example.com</li>
+          <li>Premium User: jane@example.com</li>
+          <li>Admin: admin@example.com</li>
+          <li>Loan Distributor: loan@example.com</li>
+          <li>Bank Manager: bank@example.com</li>
+        </ul>
       </div>
     </div>
   )

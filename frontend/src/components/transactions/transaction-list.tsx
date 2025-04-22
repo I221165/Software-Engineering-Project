@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { ArrowDownIcon, ArrowUpIcon, Search, Trash2 } from "lucide-react"
 import type { Transaction } from "@/types"
 import { formatCurrency, formatDate } from "@/lib/utils"

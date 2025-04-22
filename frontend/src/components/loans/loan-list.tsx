@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { BanknoteIcon } from "lucide-react"
 import type { LoanApplication } from "@/types"
 import { formatCurrency, formatDate } from "@/lib/utils"

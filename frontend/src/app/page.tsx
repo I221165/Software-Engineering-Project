@@ -14,10 +14,24 @@ export default function Home() {
     const user = getCurrentUser()
     if (user) {
       // Redirect based on user role
-      if (user.role === "loanDistributor") {
-        router.push("/loan-distributor")
-      } else {
-        router.push("/dashboard")
+      switch (user.role) {
+        case "admin":
+          router.push("/admin")
+          break
+        case "bankManager":
+          router.push("/client-summaries")
+          break
+        case "loanDistributor":
+          router.push("/loan-distributor")
+          break
+        case "financial_advisor":
+          router.push("/advisor")
+          break
+        case "premium":
+          router.push("/premium/dashboard")
+          break
+        default:
+          router.push("/dashboard")
       }
     }
   }, [router])

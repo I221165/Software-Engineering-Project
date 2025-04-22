@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -18,6 +18,17 @@ import {
   FileText,
   Calculator,
   Bell,
+  Shield,
+  Activity,
+  FileWarning,
+  Calendar,
+  Wallet,
+  Users,
+  CreditCard,
+  BarChart,
+  Briefcase,
+  LineChart,
+  ClipboardList,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getCurrentUser } from "@/services/authService"
@@ -29,7 +40,7 @@ interface SidebarProps {
 export function Sidebar({ onLogout }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>("")
 
   useEffect(() => {
     const user = getCurrentUser()
@@ -48,28 +59,59 @@ export function Sidebar({ onLogout }: SidebarProps) {
   }
 
   // Define navigation items based on user role
-  let navItems = []
-  
-  if (userRole === "loanDistributor") {
-    // Only show relevant items for loan distributors
-    navItems = [
+  const navItems = [
+    // Regular user navigation items (shown to all users)
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
+    { href: "/budget", label: "Budget", icon: PieChart },
+    { href: "/bills", label: "Bills", icon: Receipt },
+    { href: "/savings", label: "Savings", icon: PiggyBank },
+    { href: "/loans", label: "Loans", icon: BanknoteIcon },
+
+    // Admin specific items
+    ...(userRole === "admin" ? [
+      { href: "/admin", label: "Admin Dashboard", icon: Shield },
+      { href: "/admin/roles", label: "User Roles", icon: Users },
+      { href: "/admin/performance", label: "System Performance", icon: Activity },
+      { href: "/admin/security", label: "Security Logs", icon: FileWarning },
+      { href: "/admin/maintenance", label: "Maintenance", icon: Settings }
+    ] : []),
+
+    // Bank Manager specific items
+    ...(userRole === "bankManager" ? [
+      { href: "/client-summaries", label: "Client Summaries", icon: Users },
+      { href: "/consultations", label: "Consultations", icon: Calendar }
+    ] : []),
+
+    // Loan Distributor specific items
+    ...(userRole === "loanDistributor" ? [
       { href: "/loan-distributor", label: "Loan Applications", icon: FileText },
-      { href: "/loan-distributor/tax-calculator", label: "Tax Calculator", icon: Calculator },
       { href: "/loan-distributor/notifications", label: "Notifications", icon: Bell },
-      { href: "/settings", label: "Settings", icon: Settings },
-    ]
-  } else {
-    // Regular user navigation items
-    navItems = [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
-      { href: "/budget", label: "Budget", icon: PieChart },
-      { href: "/bills", label: "Bills", icon: Receipt },
-      { href: "/savings", label: "Savings", icon: PiggyBank },
-      { href: "/loans", label: "Loans", icon: BanknoteIcon },
-      { href: "/settings", label: "Settings", icon: Settings },
-    ]
-  }
+      { href: "/loan-distributor/tax-calculator", label: "Tax Calculator", icon: Calculator }
+    ] : []),
+
+    // Financial Advisor specific items
+    ...(userRole === "financial_advisor" ? [
+      { href: "/advisor", label: "Advisor Dashboard", icon: Briefcase },
+      { href: "/advisor/clients", label: "Clients", icon: Users },
+      { href: "/advisor/portfolio", label: "Portfolio Analysis", icon: LineChart },
+      { href: "/advisor/consultations", label: "Consultations", icon: Calendar },
+      { href: "/advisor/reports", label: "Financial Reports", icon: ClipboardList }
+    ] : []),
+
+    // Premium user specific items
+    ...(userRole === "premium" ? [
+      { href: "/premium/dashboard", label: "Premium Dashboard", icon: LayoutDashboard },
+      { href: "/premium/portfolio", label: "Portfolio Analysis", icon: PieChart },
+      { href: "/premium/investments", label: "Investments", icon: BarChart },
+      { href: "/premium/planning", label: "Financial Planning", icon: Calculator },
+      { href: "/premium/tax", label: "Tax Optimization", icon: Receipt },
+      { href: "/premium/reports", label: "Premium Reports", icon: FileText }
+    ] : []),
+
+    // Settings (shown to all users)
+    { href: "/settings", label: "Settings", icon: Settings }
+  ]
 
   return (
     <>

@@ -1,31 +1,45 @@
 import type { User } from "../types"
 
+type UserRole = "regular" | "premium" | "admin" | "loanDistributor" | "bankManager" | "financial_advisor"
+
 // Dummy user data
 const dummyUsers: User[] = [
   {
     id: "1",
     name: "John Doe",
     email: "john@example.com",
-    role: "regular",
+    role: "regular"
   },
   {
     id: "2",
     name: "Jane Smith",
     email: "jane@example.com",
-    role: "premium",
+    role: "premium"
   },
   {
     id: "3",
     name: "Admin User",
     email: "admin@example.com",
-    role: "admin",
+    role: "admin"
   },
   {
     id: "4",
     name: "Loan Distributor",
     email: "loan@example.com",
-    role: "loanDistributor",
+    role: "loanDistributor"
   },
+  {
+    id: "5",
+    name: "Financial Advisor",
+    email: "advisor@example.com",
+    role: "financial_advisor"
+  },
+  {
+    id: "6",
+    name: "Bank Manager",
+    email: "bank@example.com",
+    role: "bankManager"
+  }
 ]
 
 // Simulate login
@@ -45,7 +59,7 @@ export const login = async (email: string, password: string): Promise<User> => {
 }
 
 // Simulate register
-export const register = async (name: string, email: string, password: string): Promise<User> => {
+export const register = async (name: string, email: string, password: string, role: UserRole): Promise<User> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const existingUser = dummyUsers.find((u) => u.email === email)
@@ -56,7 +70,7 @@ export const register = async (name: string, email: string, password: string): P
           id: (dummyUsers.length + 1).toString(),
           name,
           email,
-          role: "regular",
+          role,
         }
         dummyUsers.push(newUser)
         localStorage.setItem("user", JSON.stringify(newUser))
