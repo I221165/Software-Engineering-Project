@@ -18,13 +18,23 @@ export default function DashboardLayout({
   const router = useRouter()
 
   useEffect(() => {
-    const user = getCurrentUser()
-    if (user) {
-      setIsAuthenticated(true)
-    } else {
-      router.push("/")
+    const checkAuth = async () => {
+      try {
+        const user = await getCurrentUser()
+        if (user) {
+          setIsAuthenticated(true)
+        } else {
+          router.push("/")
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error)
+        router.push("/")
+      } finally {
+        setIsLoading(false)
+      }
     }
-    setIsLoading(false)
+
+    checkAuth()
   }, [router])
 
   const handleLogout = () => {
