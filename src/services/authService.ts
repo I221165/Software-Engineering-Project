@@ -45,11 +45,14 @@ export const register = async (name: string, email: string, password: string): P
 // Get current user
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const response = await fetch("/api/auth/me")
+    const response = await fetch("/api/auth/me", {
+      credentials: 'include'
+    })
     if (!response.ok) return null
     const data = await response.json()
     return data.user
   } catch (error) {
+    console.error('Error getting current user:', error)
     return null
   }
 }
@@ -58,5 +61,6 @@ export const getCurrentUser = async (): Promise<User | null> => {
 export const logout = async (): Promise<void> => {
   await fetch("/api/auth/logout", {
     method: "POST",
+    credentials: 'include'
   })
 }

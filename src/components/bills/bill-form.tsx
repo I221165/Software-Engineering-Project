@@ -48,14 +48,14 @@ export function BillForm({ existingBill, onSuccess }: BillFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: existingBill?.name || "",
-      amount: existingBill?.amount || undefined,
+      amount: existingBill?.amount || 0,
       dueDate: existingBill?.dueDate ? new Date(existingBill.dueDate) : new Date(),
       isRecurring: existingBill?.isRecurring ?? false,
     },
   })
 
   const onSubmit = async (values: FormValues) => {
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {

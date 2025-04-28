@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Percent, Receipt } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Receipt } from "lucide-react"
 import type { DashboardStats } from "@/types"
-import { formatCurrency, formatPercentage } from "@/lib/utils"
+import { formatCurrency } from "@/lib/utils"
 import { getDashboardStats } from "@/services/dashboardService"
 import { getCurrentUser } from "@/services/authService"
 import { StatCard } from "@/components/dashboard/stat-card"
@@ -11,28 +11,30 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { UpcomingBills } from "@/components/dashboard/upcoming-bills"
 import { SavingsProgress } from "@/components/dashboard/savings-progress"
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown"
+import { useRefresh } from "@/contexts/refresh-context"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { refreshTrigger } = useRefresh()
 
   useEffect(() => {
     const fetchStats = async () => {
-      const user = getCurrentUser()
-      if (user) {
-        try {
+      try {
+        const user = await getCurrentUser()
+        if (user) {
           const data = await getDashboardStats(user.id)
           setStats(data)
-        } catch (error) {
-          console.error("Error fetching dashboard stats:", error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error("Error fetching dashboard stats:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchStats()
-  }, [])
+  }, [refreshTrigger])
 
   if (isLoading) {
     return (
@@ -47,7 +49,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {stats && (
             <>
               <StatCard
@@ -55,26 +57,17 @@ export default function DashboardPage() {
                 value={formatCurrency(stats.totalIncome)}
                 description="Current month"
                 icon={ArrowUpRight}
-                trend={{ value: 12, isPositive: true }}
               />
               <StatCard
                 title="Total Expenses"
-                value={formatCurrency(stats.totalExpense)}
+                value={formatCurrency(stats.totalExpenses)}
                 description="Current month"
                 icon={ArrowDownRight}
-                trend={{ value: 8, isPositive: false }}
               />
               <StatCard
-                title="Savings Rate"
-                value={formatPercentage(stats.savingsRate)}
-                description="Of total income"
-                icon={Percent}
-                trend={{ value: 5, isPositive: true }}
-              />
-              <StatCard
-                title="Upcoming Bills"
-                value={stats.upcomingBills}
-                description="Due in the next 7 days"
+                title="Balance"
+                value={formatCurrency(stats.balance)}
+                description="Current month"
                 icon={Receipt}
               />
             </>
@@ -83,13 +76,13 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentTransactions />
-        <UpcomingBills />
+        <RecentTransactions refreshTrigger={refreshTrigger} />
+        <UpcomingBills refreshTrigger={refreshTrigger} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ExpenseBreakdown />
-        <SavingsProgress />
+        <ExpenseBreakdown refreshTrigger={refreshTrigger} />
+        <SavingsProgress refreshTrigger={refreshTrigger} />
       </div>
     </div>
   )

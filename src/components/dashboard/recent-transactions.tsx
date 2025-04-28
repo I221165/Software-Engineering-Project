@@ -7,27 +7,32 @@ import { formatCurrency, formatDate } from "@/lib/utils"
 import { getTransactions } from "@/services/transactionService"
 import { getCurrentUser } from "@/services/authService"
 
-export function RecentTransactions() {
+interface RecentTransactionsProps {
+  refreshTrigger?: number
+}
+
+export function RecentTransactions({ refreshTrigger = 0 }: RecentTransactionsProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const user = await getCurrentUser()
-      if (user) {
-        try {
+      setIsLoading(true)
+      try {
+        const user = await getCurrentUser()
+        if (user) {
           const data = await getTransactions(user.id)
           setTransactions(data.slice(0, 5)) // Get only the 5 most recent
-        } catch (error) {
-          console.error("Error fetching transactions:", error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error("Error fetching transactions:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchTransactions()
-  }, [])
+  }, [refreshTrigger])
 
   if (isLoading) {
     return (

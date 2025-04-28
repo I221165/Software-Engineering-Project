@@ -1,0 +1,17 @@
+import mongoose from 'mongoose';
+
+const loanSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  amount: { type: Number, required: true },
+  status: { 
+    type: String, 
+    required: true, 
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  tax: { type: Number, required: true },
+}, {
+  timestamps: true,
+});
+
+export const Loan = mongoose.models.Loan || mongoose.model('Loan', loanSchema); 

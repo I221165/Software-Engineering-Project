@@ -15,20 +15,6 @@ export interface Transaction {
   type: "income" | "expense"
 }
 
-export interface Budget {
-  id: string
-  userId: string
-  month: number
-  year: number
-  categories: BudgetCategory[]
-}
-
-export interface BudgetCategory {
-  category: string
-  limit: number
-  spent: number
-}
-
 export interface Bill {
   id: string
   userId: string
@@ -63,10 +49,9 @@ export interface AuthState {
 
 export interface DashboardStats {
   totalIncome: number
-  totalExpense: number
-  savingsRate: number
-  upcomingBills: number
-  pendingLoans: number
+  totalExpenses: number
+  balance: number
+  role: string
 }
 
 export type CategoryColors = Record<string, string>

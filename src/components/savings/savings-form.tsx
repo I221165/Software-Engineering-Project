@@ -43,13 +43,13 @@ export function SavingsForm({ existingGoal, onSuccess }: SavingsFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: existingGoal?.name || "",
-      targetAmount: existingGoal?.targetAmount || undefined,
+      targetAmount: existingGoal?.targetAmount || 0,
       currentAmount: existingGoal?.currentAmount || 0,
     },
   })
 
   const onSubmit = async (values: FormValues) => {
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {

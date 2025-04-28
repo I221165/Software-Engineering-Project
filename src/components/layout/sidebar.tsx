@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
   ArrowRightLeft,
-  PieChart,
   Receipt,
   PiggyBank,
   BanknoteIcon,
@@ -39,7 +38,6 @@ export function Sidebar({ onLogout }: SidebarProps) {
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
-    { href: "/budget", label: "Budget", icon: PieChart },
     { href: "/bills", label: "Bills", icon: Receipt },
     { href: "/savings", label: "Savings", icon: PiggyBank },
     { href: "/loans", label: "Loans", icon: BanknoteIcon },

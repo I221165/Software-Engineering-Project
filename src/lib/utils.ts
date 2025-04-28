@@ -56,9 +56,10 @@ export function getMonthName(month: number): string {
 }
 
 // Get days until date
-export function getDaysUntil(date: Date): number {
+export function getDaysUntil(date: Date | string): number {
   const now = new Date()
-  const diffTime = date.getTime() - now.getTime()
+  const targetDate = new Date(date)
+  const diffTime = targetDate.getTime() - now.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   return diffDays
 }

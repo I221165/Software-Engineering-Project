@@ -7,12 +7,12 @@ const publicRoutes = ['/', '/login', '/register', '/unauthorized'];
 
 // Define role-based access control
 const roleAccess: Record<string, string[]> = {
-  regular: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings'],
-  premium: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings', '/premium-features'],
-  admin: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings', '/admin'],
-  bank_manager: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings', '/bank'],
-  loan_distributor: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings', '/loans'],
-  financial_advisor: ['/dashboard', '/transactions', '/bills', '/budget', '/savings', '/settings', '/advice']
+  regular: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
+  premium: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/premium-features', '/loans'],
+  admin: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/admin', '/loans'],
+  bank_manager: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/bank', '/loans'],
+  loan_distributor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
+  financial_advisor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/advice', '/loans']
 };
 
 export async function middleware(request: NextRequest) {

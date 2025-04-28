@@ -13,15 +13,20 @@ interface ExpenseData {
   color: string
 }
 
-export function ExpenseBreakdown() {
+interface ExpenseBreakdownProps {
+  refreshTrigger?: number
+}
+
+export function ExpenseBreakdown({ refreshTrigger = 0 }: ExpenseBreakdownProps) {
   const [data, setData] = useState<ExpenseData[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = getCurrentUser()
-      if (user) {
-        try {
+      setIsLoading(true)
+      try {
+        const user = await getCurrentUser()
+        if (user) {
           const stats = await getTransactionStats(user.id)
 
           // Convert category summary to chart data
@@ -35,16 +40,16 @@ export function ExpenseBreakdown() {
             .slice(0, 5) // Top 5 categories
 
           setData(chartData)
-        } catch (error) {
-          console.error("Error fetching expense data:", error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error("Error fetching expense data:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchData()
-  }, [])
+  }, [refreshTrigger])
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {

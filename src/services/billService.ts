@@ -36,6 +36,28 @@ export const addBill = async (bill: Omit<Bill, 'id'>): Promise<Bill> => {
   }
 };
 
+// Update a bill
+export const updateBill = async (bill: Bill): Promise<Bill> => {
+  try {
+    const response = await fetch('/api/bills', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bill),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update bill');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating bill:', error);
+    throw error;
+  }
+};
+
 // Delete a bill
 export const deleteBill = async (userId: string, billId: string): Promise<void> => {
   try {

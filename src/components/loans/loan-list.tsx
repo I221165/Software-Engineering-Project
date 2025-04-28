@@ -19,7 +19,7 @@ export function LoanList({ refreshTrigger = 0 }: LoanListProps) {
 
   const fetchLoans = async () => {
     setIsLoading(true)
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (user) {
       try {
         const data = await getLoanApplications(user.id)
@@ -61,8 +61,8 @@ export function LoanList({ refreshTrigger = 0 }: LoanListProps) {
     <div>
       <div className="grid grid-dashboard">
         {loans.length > 0 ? (
-          loans.map((loan) => (
-            <Card key={loan.id} className="glass-card border-emerald/20">
+          loans.map((loan, index) => (
+            <Card key={`${loan.id}-${index}`} className="glass-card border-emerald/20">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>

@@ -7,27 +7,32 @@ import { formatCurrency, getDaysUntil } from "@/lib/utils"
 import { getUpcomingBills } from "@/services/billService"
 import { getCurrentUser } from "@/services/authService"
 
-export function UpcomingBills() {
+interface UpcomingBillsProps {
+  refreshTrigger?: number
+}
+
+export function UpcomingBills({ refreshTrigger = 0 }: UpcomingBillsProps) {
   const [bills, setBills] = useState<Bill[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchBills = async () => {
-      const user = getCurrentUser()
-      if (user) {
-        try {
+      setIsLoading(true)
+      try {
+        const user = await getCurrentUser()
+        if (user) {
           const data = await getUpcomingBills(user.id, 14) // Get bills due in the next 14 days
           setBills(data)
-        } catch (error) {
-          console.error("Error fetching bills:", error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error("Error fetching bills:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchBills()
-  }, [])
+  }, [refreshTrigger])
 
   if (isLoading) {
     return (

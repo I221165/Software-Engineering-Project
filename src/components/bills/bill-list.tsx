@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Calendar } from "lucide-react"
 import type { Bill } from "@/types"
-import { formatCurrency, getDaysUntil } from "@/lib/utils"
+import { formatCurrency, getDaysUntil, formatDate } from "@/lib/utils"
 import { getBills, deleteBill } from "@/services/billService"
 import { getCurrentUser } from "@/services/authService"
 import { Button } from "@/components/ui/button"
@@ -33,7 +33,7 @@ export function BillList({ refreshTrigger = 0 }: BillListProps) {
 
   const fetchBills = async () => {
     setIsLoading(true)
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (user) {
       try {
         const data = await getBills(user.id)
@@ -53,7 +53,7 @@ export function BillList({ refreshTrigger = 0 }: BillListProps) {
   const handleDelete = async () => {
     if (!billToDelete) return
 
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {
@@ -65,8 +65,9 @@ export function BillList({ refreshTrigger = 0 }: BillListProps) {
     }
   }
 
-  const getBillStatusClass = (dueDate: Date) => {
-    const daysUntil = getDaysUntil(dueDate)
+  const getBillStatusClass = (dueDate: Date | string) => {
+    const date = new Date(dueDate)
+    const daysUntil = getDaysUntil(date)
 
     if (daysUntil <= 0) {
       return "bg-destructive text-destructive-foreground"
@@ -77,8 +78,9 @@ export function BillList({ refreshTrigger = 0 }: BillListProps) {
     }
   }
 
-  const getBillStatusText = (dueDate: Date) => {
-    const daysUntil = getDaysUntil(dueDate)
+  const getBillStatusText = (dueDate: Date | string) => {
+    const date = new Date(dueDate)
+    const daysUntil = getDaysUntil(date)
 
     if (daysUntil < 0) {
       return `Overdue by ${Math.abs(daysUntil)} days`
@@ -109,7 +111,7 @@ export function BillList({ refreshTrigger = 0 }: BillListProps) {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>{bill.name}</CardTitle>
-                    <CardDescription>Due on {new Date(bill.dueDate).toLocaleDateString()}</CardDescription>
+                    <CardDescription>Due on {formatDate(new Date(bill.dueDate))}</CardDescription>
                   </div>
                   {bill.isRecurring && (
                     <Badge variant="outline" className="border-emerald/30 text-emerald">

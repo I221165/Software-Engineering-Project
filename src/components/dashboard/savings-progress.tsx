@@ -7,22 +7,27 @@ import { getSavingsGoals } from "@/services/savingsService"
 import { getCurrentUser } from "@/services/authService"
 import { Progress } from "@/components/ui/progress"
 
-export function SavingsProgress() {
+interface SavingsProgressProps {
+  refreshTrigger?: number
+}
+
+export function SavingsProgress({ refreshTrigger = 0 }: SavingsProgressProps) {
   const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchGoals = async () => {
-      const user = getCurrentUser()
-      if (user) {
-        try {
+      setIsLoading(true)
+      try {
+        const user = await getCurrentUser()
+        if (user) {
           const data = await getSavingsGoals(user.id)
           setGoals(data)
-        } catch (error) {
-          console.error("Error fetching savings goals:", error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error("Error fetching savings goals:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 

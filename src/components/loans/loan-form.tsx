@@ -40,7 +40,7 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: undefined,
+      amount: 0,
     },
   })
 
@@ -53,7 +53,7 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
   }
 
   const onSubmit = async (values: FormValues) => {
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {

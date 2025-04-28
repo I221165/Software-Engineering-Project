@@ -1,92 +1,62 @@
 import type { LoanApplication } from "../types"
 
-// Generate dummy loan applications
-const generateDummyLoanApplications = (userId: string): LoanApplication[] => {
-  return [
-    {
-      id: "loan-1",
-      userId,
-      amount: 5000,
-      status: "approved",
-      tax: 250,
-      createdAt: new Date(new Date().setDate(new Date().getDate() - 30)),
-    },
-    {
-      id: "loan-2",
-      userId,
-      amount: 10000,
-      status: "pending",
-      tax: 500,
-      createdAt: new Date(new Date().setDate(new Date().getDate() - 5)),
-    },
-    {
-      id: "loan-3",
-      userId,
-      amount: 2000,
-      status: "rejected",
-      tax: 100,
-      createdAt: new Date(new Date().setDate(new Date().getDate() - 60)),
-    },
-  ]
-}
-
-// Dummy loan applications store
-const dummyLoanApplications: Record<string, LoanApplication[]> = {}
-
 // Get loan applications for a user
 export const getLoanApplications = async (userId: string): Promise<LoanApplication[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!dummyLoanApplications[userId]) {
-        dummyLoanApplications[userId] = generateDummyLoanApplications(userId)
-      }
-
-      // Sort by created date (newest first)
-      const sortedApplications = [...dummyLoanApplications[userId]].sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      )
-
-      resolve(sortedApplications)
-    }, 500)
-  })
-}
+  try {
+    const response = await fetch(`/api/loans?userId=${userId}`, {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch loan applications');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching loan applications:', error);
+    throw error;
+  }
+};
 
 // Apply for a new loan
 export const applyForLoan = async (userId: string, amount: number): Promise<LoanApplication> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const tax = amount * 0.05 // 5% tax
-
-      const newLoan: LoanApplication = {
-        id: `loan-${Date.now()}`,
+  try {
+    const response = await fetch('/api/loans', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
         userId,
         amount,
-        status: "pending",
-        tax,
-        createdAt: new Date(),
-      }
+      }),
+    });
 
-      if (!dummyLoanApplications[userId]) {
-        dummyLoanApplications[userId] = []
-      }
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to apply for loan');
+    }
 
-      dummyLoanApplications[userId].unshift(newLoan)
-      resolve(newLoan)
-    }, 500)
-  })
-}
+    return await response.json();
+  } catch (error) {
+    console.error('Error applying for loan:', error);
+    throw error;
+  }
+};
 
 // Get pending loans count
 export const getPendingLoansCount = async (userId: string): Promise<number> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!dummyLoanApplications[userId]) {
-        dummyLoanApplications[userId] = generateDummyLoanApplications(userId)
-      }
-
-      const pendingCount = dummyLoanApplications[userId].filter((loan) => loan.status === "pending").length
-
-      resolve(pendingCount)
-    }, 500)
-  })
-}
+  try {
+    const response = await fetch(`/api/loans/pending?userId=${userId}`, {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch pending loans count');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching pending loans count:', error);
+    throw error;
+  }
+};

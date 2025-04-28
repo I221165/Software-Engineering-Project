@@ -40,12 +40,13 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
   const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [goalToDelete, setGoalToDelete] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [contributionAmount, setContributionAmount] = useState<number>(0)
   const [contributingGoalId, setContributingGoalId] = useState<string | null>(null)
 
   const fetchGoals = async () => {
     setIsLoading(true)
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (user) {
       try {
         const data = await getSavingsGoals(user.id)
@@ -65,7 +66,7 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
   const handleDelete = async () => {
     if (!goalToDelete) return
 
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {
@@ -78,20 +79,39 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
   }
 
   const handleContribute = async () => {
-    if (!contributingGoalId || contributionAmount <= 0) return
+    console.log('Starting contribution:', { contributingGoalId, contributionAmount })
+    
+    if (!contributingGoalId || contributionAmount <= 0) {
+      console.log('Invalid contribution data:', { contributingGoalId, contributionAmount })
+      return
+    }
 
-    const user = getCurrentUser()
-    if (!user) return
+    const user = await getCurrentUser()
+    if (!user) {
+      console.log('No user found')
+      return
+    }
 
     try {
+      console.log('Sending contribution request:', {
+        userId: user.id,
+        goalId: contributingGoalId,
+        amount: contributionAmount
+      })
+
       const updatedGoal = await updateSavingsAmount(user.id, contributingGoalId, contributionAmount)
+      console.log('Contribution successful:', updatedGoal)
+      
+      await fetchGoals()
 
-      setGoals((prev) => prev.map((goal) => (goal.id === updatedGoal.id ? updatedGoal : goal)))
-
+      // Reset the contribution form and close dialog
       setContributingGoalId(null)
       setContributionAmount(0)
+      setIsDialogOpen(false)
     } catch (error) {
       console.error("Error contributing to savings goal:", error)
+      // Show error to user
+      alert('Failed to contribute. Please try again.')
     }
   }
 
@@ -111,7 +131,7 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
             const percentage = calculatePercentage(goal.currentAmount, goal.targetAmount)
 
             return (
-              <Card key={goal.id} className="glass-card border-emerald/20">
+              <Card key={`savings-goal-${goal.id}`} className="glass-card border-emerald/20">
                 <CardHeader className="pb-2">
                   <CardTitle>{goal.name}</CardTitle>
                   <CardDescription>
@@ -133,9 +153,17 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
                 <CardFooter className="flex justify-between">
                   <div className="flex gap-2">
                     <SavingsForm existingGoal={goal} onSuccess={fetchGoals} />
-                    <Dialog>
+                    <Dialog open={isDialogOpen && contributingGoalId === goal.id} onOpenChange={setIsDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => setContributingGoalId(goal.id)}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            console.log('Opening dialog for goal:', goal.id)
+                            setContributingGoalId(goal.id)
+                            setIsDialogOpen(true)
+                          }}
+                        >
                           <Plus className="h-4 w-4 mr-1" /> Contribute
                         </Button>
                       </DialogTrigger>
@@ -156,7 +184,10 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
                               step="0.01"
                               min="0"
                               value={contributionAmount || ""}
-                              onChange={(e: any) => setContributionAmount(Number.parseFloat(e.target.value) || 0)}
+                              onChange={(e) => {
+                                console.log('Amount changed:', e.target.value)
+                                setContributionAmount(Number(e.target.value) || 0)
+                              }}
                             />
                           </div>
                           <div className="text-sm text-muted-foreground">
@@ -165,7 +196,12 @@ export function SavingsList({ refreshTrigger = 0 }: SavingsListProps) {
                           </div>
                         </div>
                         <DialogFooter>
-                          <Button onClick={handleContribute}>Add Contribution</Button>
+                          <Button 
+                            onClick={handleContribute}
+                            disabled={!contributionAmount || contributionAmount <= 0}
+                          >
+                            Add Contribution
+                          </Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>

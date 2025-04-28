@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { User } from '@/models/User';
 import connectDB from '@/lib/mongodb';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const token = request.headers.get('cookie')?.split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1];
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -24,14 +24,14 @@ export async function GET() {
 
     return NextResponse.json({
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role
       }
     });
   } catch (error) {
-    console.error('Error in /api/auth/me:', error);
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('Error getting current user:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 
