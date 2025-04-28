@@ -23,8 +23,11 @@ export function Header({ onLogout }: HeaderProps) {
   const [user, setUser] = useState<UserType | null>(null)
 
   useEffect(() => {
-    const currentUser = getCurrentUser()
-    setUser(currentUser)
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser()
+      setUser(currentUser)
+    }
+    fetchUser()
   }, [])
 
   const handleLogout = () => {
@@ -32,7 +35,8 @@ export function Header({ onLogout }: HeaderProps) {
     onLogout()
   }
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined | null) => {
+    if (!name) return "U"
     return name
       .split(" ")
       .map((part) => part[0])

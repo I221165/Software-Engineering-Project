@@ -13,7 +13,7 @@ export function RecentTransactions() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const user = getCurrentUser()
+      const user = await getCurrentUser()
       if (user) {
         try {
           const data = await getTransactions(user.id)

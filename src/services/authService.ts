@@ -1,72 +1,62 @@
 import type { User } from "../types"
 
-// Dummy user data
-const dummyUsers: User[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "regular",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "premium",
-  },
-  {
-    id: "3",
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "admin",
-  },
-]
-
-// Simulate login
+// Login
 export const login = async (email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const user = dummyUsers.find((u) => u.email === email)
-      if (user) {
-        // In a real app, we would validate the password here
-        localStorage.setItem("user", JSON.stringify(user))
-        resolve(user)
-      } else {
-        reject(new Error("Invalid credentials"))
-      }
-    }, 800)
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
   })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to login")
+  }
+
+  if (!data.user) {
+    throw new Error("No user data received")
+  }
+
+  return data.user
 }
 
-// Simulate register
+// Register
 export const register = async (name: string, email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const existingUser = dummyUsers.find((u) => u.email === email)
-      if (existingUser) {
-        reject(new Error("User already exists"))
-      } else {
-        const newUser: User = {
-          id: (dummyUsers.length + 1).toString(),
-          name,
-          email,
-          role: "regular",
-        }
-        dummyUsers.push(newUser)
-        localStorage.setItem("user", JSON.stringify(newUser))
-        resolve(newUser)
-      }
-    }, 800)
+  const response = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
   })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || "Failed to register")
+  }
+
+  const data = await response.json()
+  return data.user
 }
 
 // Get current user
-export const getCurrentUser = (): User | null => {
-  const userJson = localStorage.getItem("user")
-  return userJson ? JSON.parse(userJson) : null
+export const getCurrentUser = async (): Promise<User | null> => {
+  try {
+    const response = await fetch("/api/auth/me")
+    if (!response.ok) return null
+    const data = await response.json()
+    return data.user
+  } catch (error) {
+    return null
+  }
 }
 
 // Logout
-export const logout = (): void => {
-  localStorage.removeItem("user")
+export const logout = async (): Promise<void> => {
+  await fetch("/api/auth/logout", {
+    method: "POST",
+  })
 }

@@ -11,10 +11,13 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    const user = getCurrentUser()
-    if (user) {
-      router.push("/dashboard")
+    const checkUser = async () => {
+      const user = await getCurrentUser()
+      if (user) {
+        router.push("/dashboard")
+      }
     }
+    checkUser()
   }, [router])
 
   return (

@@ -32,7 +32,7 @@ const formSchema = z.object({
   category: z.string().min(1, { message: "Please select a category" }),
   amount: z.coerce.number().positive({ message: "Amount must be positive" }),
   date: z.date(),
-  description: z.string().optional(),
+  description: z.string().min(1, { message: "Description is required" }),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -49,25 +49,27 @@ export function TransactionForm({ onSuccess }: TransactionFormProps) {
     defaultValues: {
       type: "expense",
       category: "",
-      amount: undefined,
+      amount: 0,
       date: new Date(),
       description: "",
     },
   })
 
   const onSubmit = async (values: FormValues) => {
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {
-      await addTransaction({
+      const transactionData = {
         userId: user.id,
         type: values.type,
         category: values.category,
-        amount: values.amount,
+        amount: Number(values.amount),
         date: values.date,
-        description: values.description,
-      })
+        description: values.description || `${values.type} for ${values.category}`,
+      }
+
+      await addTransaction(transactionData)
 
       form.reset()
       setOpen(false)

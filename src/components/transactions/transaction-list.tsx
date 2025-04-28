@@ -38,7 +38,7 @@ export function TransactionList({ refreshTrigger = 0 }: TransactionListProps) {
   useEffect(() => {
     const fetchTransactions = async () => {
       setIsLoading(true)
-      const user = getCurrentUser()
+      const user = await getCurrentUser()
       if (user) {
         try {
           const data = await getTransactions(user.id)
@@ -81,7 +81,7 @@ export function TransactionList({ refreshTrigger = 0 }: TransactionListProps) {
   const handleDelete = async () => {
     if (!transactionToDelete) return
 
-    const user = getCurrentUser()
+    const user = await getCurrentUser()
     if (!user) return
 
     try {

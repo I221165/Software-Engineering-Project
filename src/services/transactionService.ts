@@ -1,4 +1,6 @@
-import type { Transaction } from "../types"
+import { Transaction } from '@/models/Transaction';
+import connectDB from '@/lib/mongodb';
+import type { Transaction as TransactionType } from '../types';
 
 // Categories for transactions
 export const categories = [
@@ -39,8 +41,8 @@ export const categoryColors: Record<string, string> = {
 }
 
 // Generate dummy transactions
-const generateDummyTransactions = (userId: string): Transaction[] => {
-  const transactions: Transaction[] = []
+const generateDummyTransactions = (userId: string): TransactionType[] => {
+  const transactions: TransactionType[] = []
   const currentDate = new Date()
 
   // Generate transactions for the last 3 months
@@ -68,89 +70,99 @@ const generateDummyTransactions = (userId: string): Transaction[] => {
 }
 
 // Dummy transactions store
-const dummyTransactions: Record<string, Transaction[]> = {}
+const dummyTransactions: Record<string, TransactionType[]> = {}
 
 // Get transactions for a user
-export const getTransactions = async (userId: string): Promise<Transaction[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!dummyTransactions[userId]) {
-        dummyTransactions[userId] = generateDummyTransactions(userId)
-      }
-      resolve(dummyTransactions[userId])
-    }, 500)
-  })
-}
+export const getTransactions = async (userId: string): Promise<TransactionType[]> => {
+  try {
+    const response = await fetch(`/api/transactions?userId=${userId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch transactions');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    throw error;
+  }
+};
 
 // Add a new transaction
-export const addTransaction = async (transaction: Omit<Transaction, "id">): Promise<Transaction> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newTransaction: Transaction = {
-        ...transaction,
-        id: `trans-${Date.now()}`,
-      }
+export const addTransaction = async (transaction: Omit<TransactionType, 'id'>): Promise<TransactionType> => {
+  try {
+    const response = await fetch('/api/transactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transaction),
+    });
 
-      if (!dummyTransactions[transaction.userId]) {
-        dummyTransactions[transaction.userId] = []
-      }
+    if (!response.ok) {
+      throw new Error('Failed to add transaction');
+    }
 
-      dummyTransactions[transaction.userId].unshift(newTransaction)
-      resolve(newTransaction)
-    }, 500)
-  })
-}
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding transaction:', error);
+    throw error;
+  }
+};
 
 // Delete a transaction
 export const deleteTransaction = async (userId: string, transactionId: string): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (dummyTransactions[userId]) {
-        dummyTransactions[userId] = dummyTransactions[userId].filter((t) => t.id !== transactionId)
-      }
-      resolve()
-    }, 500)
-  })
-}
+  try {
+    const response = await fetch(`/api/transactions?userId=${userId}&transactionId=${transactionId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete transaction');
+    }
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    throw error;
+  }
+};
 
 // Get transaction statistics
 export const getTransactionStats = async (
   userId: string,
 ): Promise<{
-  totalIncome: number
-  totalExpense: number
-  netSavings: number
-  categorySummary: Record<string, number>
+  totalIncome: number;
+  totalExpense: number;
+  netSavings: number;
+  categorySummary: Record<string, number>;
 }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (!dummyTransactions[userId]) {
-        dummyTransactions[userId] = generateDummyTransactions(userId)
-      }
+  try {
+    const transactions = await getTransactions(userId);
 
-      const transactions = dummyTransactions[userId]
+    const totalIncome = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
 
-      const totalIncome = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + t.amount, 0)
+    const totalExpense = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
 
-      const totalExpense = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + t.amount, 0)
+    const categorySummary: Record<string, number> = {};
 
-      const categorySummary: Record<string, number> = {}
+    transactions
+      .filter(t => t.type === 'expense')
+      .forEach(t => {
+        if (!categorySummary[t.category]) {
+          categorySummary[t.category] = 0;
+        }
+        categorySummary[t.category] += t.amount;
+      });
 
-      transactions
-        .filter((t) => t.type === "expense")
-        .forEach((t) => {
-          if (!categorySummary[t.category]) {
-            categorySummary[t.category] = 0
-          }
-          categorySummary[t.category] += t.amount
-        })
-
-      resolve({
-        totalIncome,
-        totalExpense,
-        netSavings: totalIncome - totalExpense,
-        categorySummary,
-      })
-    }, 500)
-  })
-}
+    return {
+      totalIncome,
+      totalExpense,
+      netSavings: totalIncome - totalExpense,
+      categorySummary,
+    };
+  } catch (error) {
+    console.error('Error fetching transaction stats:', error);
+    throw error;
+  }
+};

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { register } from "@/services/authService"
+import { login } from "@/services/authService"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
@@ -47,9 +48,10 @@ export function RegisterForm() {
 
     try {
       await register(values.name, values.email, values.password)
+      await login(values.email, values.password)
       router.push("/dashboard")
-    } catch (err) {
-      setError("Registration failed. Please try again.")
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.")
     } finally {
       setIsLoading(false)
     }

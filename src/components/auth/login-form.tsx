@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { login } from "@/services/authService"
+import { login, getCurrentUser } from "@/services/authService"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
@@ -37,10 +37,23 @@ export function LoginForm() {
     setError(null)
 
     try {
-      await login(values.email, values.password)
+      const user = await login(values.email, values.password)
+      console.log('Login successful, user:', user)
+      
+      // Wait for a short delay to ensure session is established
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // Verify the session is established
+      const currentUser = await getCurrentUser()
+      if (!currentUser) {
+        throw new Error('Session not established')
+      }
+      
       router.push("/dashboard")
-    } catch (err) {
-      setError("Invalid email or password")
+      router.refresh()
+    } catch (err: any) {
+      console.error('Login error:', err)
+      setError(err.message || "Invalid email or password")
     } finally {
       setIsLoading(false)
     }
