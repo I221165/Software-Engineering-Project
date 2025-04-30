@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserRoleManagement from '@/components/admin/UserRoleManagement';
 import SystemPerformance from '@/components/admin/SystemPerformance';
 import SecurityLogs from '@/components/admin/SecurityLogs';
-import MaintenanceNotification from '@/components/admin/MaintenanceNotification';
 
 const AdminDashboard = () => {
   return (
@@ -15,7 +14,6 @@ const AdminDashboard = () => {
           <TabsTrigger value="roles">User Roles</TabsTrigger>
           <TabsTrigger value="performance">System Performance</TabsTrigger>
           <TabsTrigger value="security">Security Logs</TabsTrigger>
-          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="roles">
@@ -29,10 +27,7 @@ const AdminDashboard = () => {
         <TabsContent value="security">
           <SecurityLogs />
         </TabsContent>
-
-        <TabsContent value="maintenance">
-          <MaintenanceNotification />
-        </TabsContent>
+        
       </Tabs>
     </div>
   );
