@@ -4,10 +4,10 @@ import { User } from '@/models/User';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = context.params;
     
     await connectDB();
     
