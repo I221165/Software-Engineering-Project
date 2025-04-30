@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/', '/login', '/register', '/unauthorized'];
+const publicRoutes = ['/login', '/register', '/unauthorized'];
 
 // Define role-based access control
 const roleAccess: Record<string, string[]> = {
@@ -15,30 +15,55 @@ const roleAccess: Record<string, string[]> = {
   financial_advisor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/advice', '/loans']
 };
 
+// Define role-based dashboard paths
+const roleDashboardPaths: Record<string, string> = {
+  regular: '/dashboard',
+  premium: '/dashboard',
+  admin: '/admin-dashboard',
+  bank_manager: '/dashboard',
+  loan_distributor: '/dashboard',
+  financial_advisor: '/dashboard'
+};
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   console.log('Middleware - Pathname:', pathname);
-
-  // Allow public routes
-  if (publicRoutes.includes(pathname)) {
-    console.log('Middleware - Public route, allowing access');
-    return NextResponse.next();
-  }
 
   // Get token from cookie
   const token = request.cookies.get('token')?.value;
   console.log('Middleware - Token present:', !!token);
 
-  // If no token, redirect to home
-  if (!token) {
-    console.log('Middleware - No token, redirecting to home');
-    return NextResponse.redirect(new URL('/', request.url));
+  // If no token and trying to access protected route, redirect to login
+  if (!token && !publicRoutes.includes(pathname) && pathname !== '/') {
+    console.log('Middleware - No token, redirecting to login');
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // If user is authenticated and on root path, redirect to appropriate dashboard
+  if (token && pathname === '/') {
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET || '');
+      const { payload } = await jwtVerify(token as string, secret);
+      const userRole = payload.role as string;
+      const dashboardPath = roleDashboardPaths[userRole] || '/dashboard';
+      console.log('Middleware - Redirecting to dashboard:', dashboardPath);
+      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    } catch (error) {
+      console.error('Middleware - Token verification failed:', error);
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  // Allow public routes and home page
+  if (publicRoutes.includes(pathname) || pathname === '/') {
+    console.log('Middleware - Public route, allowing access');
+    return NextResponse.next();
   }
 
   try {
     // Verify the token using jose
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || '');
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token as string, secret);
     
     // Check if user has access to the requested route
     const userRole = payload.role as string;
@@ -69,8 +94,8 @@ export async function middleware(request: NextRequest) {
     });
   } catch (error) {
     console.error('Middleware - Token verification failed:', error);
-    // If token is invalid, redirect to home
-    return NextResponse.redirect(new URL('/', request.url));
+    // If token is invalid, redirect to login
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 }
 

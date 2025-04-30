@@ -61,7 +61,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
 
     // Admin specific items
     ...(userRole === "admin" ? [
-      { href: "/admin", label: "Admin Dashboard", icon: Shield },
+      { href: "/admin-dashboard", label: "Admin Dashboard", icon: Shield },
       { href: "/admin/roles", label: "User Roles", icon: Users },
       { href: "/admin/performance", label: "System Performance", icon: Activity },
       { href: "/admin/security", label: "Security Logs", icon: FileWarning }
