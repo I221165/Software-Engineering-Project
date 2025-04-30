@@ -48,8 +48,13 @@ export function LoginForm() {
       if (!currentUser) {
         throw new Error('Session not established')
       }
+
+      if (currentUser.role === 'admin') {
+        router.push("/admin-dashboard")
+      } else {
+        router.push("/dashboard")
+      }
       
-      router.push("/dashboard")
       router.refresh()
     } catch (err: any) {
       console.error('Login error:', err)

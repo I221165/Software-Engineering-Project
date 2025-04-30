@@ -1,45 +1,30 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
-  LayoutDashboard,
-  ArrowRightLeft,
-  Receipt,
-  PiggyBank,
-  BanknoteIcon,
+  Shield,
+  Activity,
+  FileWarning,
+  Calendar,
   Settings,
   Menu,
   X,
   LogOut,
-  Shield,
-  Users,
-  Activity,
-  FileWarning,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getCurrentUser, logout } from "@/services/authService"
+import { logout } from "@/services/authService"
 
-interface SidebarProps {
+interface AdminSidebarProps {
   onLogout: () => void
 }
 
-export function Sidebar({ onLogout }: SidebarProps) {
+export function AdminSidebar({ onLogout }: AdminSidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string>("")
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getCurrentUser()
-      if (user) {
-        setUserRole(user.role)
-      }
-    }
-    fetchUser()
-  }, [])
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
@@ -49,27 +34,14 @@ export function Sidebar({ onLogout }: SidebarProps) {
     onLogout()
   }
 
+  // Admin navigation items
   const navItems = [
-    // Regular user navigation items (shown to all users)
-    ...(userRole == "regular" ? [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/transactions", label: "Transactions", icon: ArrowRightLeft },
-    { href: "/bills", label: "Bills", icon: Receipt },
-    { href: "/savings", label: "Savings", icon: PiggyBank },
-    { href: "/loans", label: "Loans", icon: BanknoteIcon }
-    ] : []),
-
-    // Admin specific items
-    ...(userRole === "admin" ? [
-      { href: "/admin", label: "Admin Dashboard", icon: Shield },
-      { href: "/admin/roles", label: "User Roles", icon: Users },
-      { href: "/admin/performance", label: "System Performance", icon: Activity },
-      { href: "/admin/security", label: "Security Logs", icon: FileWarning }
-    ] : []),
-
-    { href: "/settings", label: "Settings", icon: Settings }
-
-
+    { href: "/admin", label: "Admin Dashboard", icon: Shield },
+    { href: "/admin/roles", label: "User Roles", icon: Shield },
+    { href: "/admin/performance", label: "System Performance", icon: Activity },
+    { href: "/admin/security", label: "Security Logs", icon: FileWarning },
+    { href: "/admin/maintenance", label: "Maintenance", icon: Calendar },
+    { href: "/settings", label: "Settings", icon: Settings },
   ]
 
   return (
@@ -88,8 +60,8 @@ export function Sidebar({ onLogout }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           <div className="p-4 border-b border-emerald/20">
-            <h2 className="text-2xl font-bold text-emerald">FinWise</h2>
-            <p className="text-off-white/70 text-sm">Financial Budget Tracker</p>
+            <h2 className="text-2xl font-bold text-emerald">Admin Panel</h2>
+            <p className="text-off-white/70 text-sm">FinWise Administration</p>
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -116,12 +88,12 @@ export function Sidebar({ onLogout }: SidebarProps) {
 
           <div className="p-4 border-t border-emerald/20">
             <Button
-              variant="outline"
-              className="w-full justify-start text-off-white hover:text-emerald"
+              variant="ghost"
+              className="w-full flex items-center justify-start text-off-white hover:bg-charcoal"
               onClick={handleLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Log Out
+              <LogOut className="mr-3 h-5 w-5" />
+              Logout
             </Button>
           </div>
         </div>
@@ -131,4 +103,4 @@ export function Sidebar({ onLogout }: SidebarProps) {
       {isOpen && <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setIsOpen(false)} />}
     </>
   )
-}
+} 

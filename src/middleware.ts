@@ -9,7 +9,7 @@ const publicRoutes = ['/', '/login', '/register', '/unauthorized'];
 const roleAccess: Record<string, string[]> = {
   regular: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
   premium: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/premium-features', '/loans'],
-  admin: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/admin', '/loans'],
+  admin: ['/admin-dashboard', '/transactions', '/bills', '/savings', '/settings', '/admin', '/loans'],
   bank_manager: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/bank', '/loans'],
   loan_distributor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
   financial_advisor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/advice', '/loans']
