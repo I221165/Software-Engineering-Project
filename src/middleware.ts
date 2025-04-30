@@ -10,9 +10,9 @@ const roleAccess: Record<string, string[]> = {
   regular: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
   premium: ['/premium/dashboard', '/premium/portfolio', '/premium/investments', '/premium/planning', '/premium/tax', '/premium/reports', '/settings'],
   admin: ['/admin-dashboard', '/transactions', '/bills', '/savings', '/settings', '/admin', '/loans'],
-  bank_manager: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/bank', '/loans'],
+  bank_manager: ['/client-summaries', '/consultations', '/settings'],
   loan_distributor: ['/loan-distributor', '/transactions', '/bills', '/savings', '/settings', '/loans'],
-  financial_advisor: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/advice', '/loans']
+  financial_advisor: ['/advisor', '/advisor/clients', '/advisor/consultations', '/advisor/reports', '/advisor/portfolio', 'settings']
 };
 
 // Define role-based dashboard paths
@@ -20,9 +20,9 @@ const roleDashboardPaths: Record<string, string> = {
   regular: '/dashboard',
   premium: '/premium/dashboard',
   admin: '/admin-dashboard',
-  bank_manager: '/dashboard',
+  bank_manager: '/client-summaries',
   loan_distributor: '/loan-distributor',
-  financial_advisor: '/dashboard'
+  financial_advisor: '/advisor'
 };
 
 export async function middleware(request: NextRequest) {

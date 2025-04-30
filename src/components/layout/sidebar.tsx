@@ -23,6 +23,10 @@ import {
   BarChart,
   FileText,
   PieChart,
+  Briefcase,
+  Calendar,
+  LineChart,
+  ClipboardList,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getCurrentUser, logout } from "@/services/authService"
@@ -89,6 +93,21 @@ export function Sidebar({ onLogout }: SidebarProps) {
       { href: "/premium/tax", label: "Tax Optimization", icon: Receipt },
       { href: "/premium/reports", label: "Premium Reports", icon: FileText }
     ] : []),
+
+    // Financial Advisor specific items
+    ...(userRole === "financial_advisor" ? [
+      { href: "/advisor", label: "Advisor Dashboard", icon: Briefcase },
+      { href: "/advisor/clients", label: "Clients", icon: Users },
+      { href: "/advisor/portfolio", label: "Portfolio Analysis", icon: LineChart },
+      { href: "/advisor/consultations", label: "Consultations", icon: Calendar },
+      { href: "/advisor/reports", label: "Financial Reports", icon: ClipboardList }
+    ] : []),
+
+    // Bank Manager specific items
+    ...(userRole === "bank_manager" ? [
+      { href: "/client-summaries", label: "Client Summaries", icon: Users },
+      { href: "/consultations", label: "Consultations", icon: Calendar }
+    ] : []),  
 
     { href: "/settings", label: "Settings", icon: Settings }
 
