@@ -18,6 +18,8 @@ import {
   Users,
   Activity,
   FileWarning,
+  Calculator,
+  Bell,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getCurrentUser, logout } from "@/services/authService"
@@ -65,6 +67,14 @@ export function Sidebar({ onLogout }: SidebarProps) {
       { href: "/admin/roles", label: "User Roles", icon: Users },
       { href: "/admin/performance", label: "System Performance", icon: Activity },
       { href: "/admin/security", label: "Security Logs", icon: FileWarning }
+    ] : []),
+
+    // Loan Distributor specific items
+    ...(userRole === "loan_distributor" ? [
+      { href: "/loan-distributor", label: "Loan Distributor", icon: Shield },
+      { href: "/loan-distributor/applications", label: "Applications", icon: FileWarning },
+      { href: "/loan-distributor/notifications", label: "Notifications", icon: Bell },
+      { href: "/loan-distributor/tax-calculator", label: "Tax Calculator", icon: Calculator }
     ] : []),
 
     { href: "/settings", label: "Settings", icon: Settings }

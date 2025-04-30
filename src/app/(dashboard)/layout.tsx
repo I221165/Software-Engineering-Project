@@ -24,11 +24,11 @@ export default function DashboardLayout({
         if (user) {
           setIsAuthenticated(true)
         } else {
-          router.push("/")
+          router.replace("/")
         }
       } catch (error) {
         console.error('Error checking authentication:', error)
-        router.push("/")
+        router.replace("/")
       } finally {
         setIsLoading(false)
       }
@@ -37,9 +37,23 @@ export default function DashboardLayout({
     checkAuth()
   }, [router])
 
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    router.push("/")
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(false)
+        window.location.href = '/'
+      } else {
+        throw new Error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Error during logout:', error)
+      window.location.href = '/'
+    }
   }
 
   if (isLoading) {

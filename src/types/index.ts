@@ -33,9 +33,11 @@ export interface SavingsGoal {
 }
 
 export interface LoanApplication {
-  id: string
+  _id: string
   userId: string
+  userName: string
   amount: number
+  purpose: string
   status: "pending" | "approved" | "rejected"
   tax: number
   createdAt: Date
@@ -65,4 +67,32 @@ export interface ChartData {
     borderColor: string[]
     borderWidth: number
   }[]
+}
+
+export interface ClientLoanApplication {
+  _id: string
+  userId: string
+  userName: string
+  amount: number
+  purpose: string
+  status: "pending" | "approved" | "rejected"
+  tax: number
+  submittedDate: string
+  createdAt: Date
+}
+
+export interface TaxCalculation {
+  principal: number
+  taxRate: number
+  taxAmount: number
+  netAmount: number
+}
+
+export interface Notification {
+  id: string
+  title: string
+  message: string
+  recipient: string
+  date: string
+  read: boolean
 }

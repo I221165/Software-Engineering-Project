@@ -25,6 +25,7 @@ import { formatCurrency } from "@/lib/utils"
 
 const formSchema = z.object({
   amount: z.coerce.number().positive({ message: "Amount must be positive" }),
+  purpose: z.string().min(1, { message: "Purpose is required" }),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -41,6 +42,7 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
+      purpose: "",
     },
   })
 
@@ -57,7 +59,11 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
     if (!user) return
 
     try {
-      await applyForLoan(user.id, values.amount)
+      await applyForLoan(
+        user.id,
+        values.amount,
+        values.purpose
+      )
 
       form.reset()
       setOpen(false)
@@ -78,14 +84,14 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Apply for Loan</DialogTitle>
-          <DialogDescription>Enter the loan amount you wish to apply for.</DialogDescription>
+          <DialogDescription>Enter your loan application details.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="amount"
-              render={({ field }: any) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Loan Amount</FormLabel>
                   <FormControl>
@@ -94,11 +100,25 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
                       placeholder="0.00"
                       {...field}
                       step="0.01"
-                      onChange={(e: any) => {
+                      onChange={(e) => {
                         field.onChange(e)
                         onValueChange(Number.parseFloat(e.target.value) || 0)
                       }}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="purpose"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Purpose</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Home Renovation" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,7 +137,7 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
               </div>
               <div className="flex justify-between text-sm font-medium pt-2 border-t">
                 <span>Total Repayable:</span>
-                <span>{formatCurrency((form.watch("amount") || 0) + calculatedTax)}</span>
+                <span>{formatCurrency(Number(form.watch("amount") || 0) + calculatedTax)}</span>
               </div>
             </div>
 
