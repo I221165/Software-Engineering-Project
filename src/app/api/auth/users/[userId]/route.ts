@@ -2,18 +2,12 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { User } from '@/models/User';
 
-type RouteContext = {
-  params: {
-    userId: string;
-  };
-};
-
 export async function DELETE(
   request: Request,
-  { params }: RouteContext
+  { params }: { params: { userId: string } }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await Promise.resolve(params);
     
     await connectDB();
     
