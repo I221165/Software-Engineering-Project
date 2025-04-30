@@ -20,6 +20,9 @@ import {
   FileWarning,
   Calculator,
   Bell,
+  BarChart,
+  FileText,
+  PieChart,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getCurrentUser, logout } from "@/services/authService"
@@ -75,6 +78,16 @@ export function Sidebar({ onLogout }: SidebarProps) {
       { href: "/loan-distributor/applications", label: "Applications", icon: FileWarning },
       { href: "/loan-distributor/notifications", label: "Notifications", icon: Bell },
       { href: "/loan-distributor/tax-calculator", label: "Tax Calculator", icon: Calculator }
+    ] : []),
+
+    // Premium user specific items
+    ...(userRole === "premium" ? [
+      { href: "/premium/dashboard", label: "Premium Dashboard", icon: LayoutDashboard },
+      { href: "/premium/portfolio", label: "Portfolio Analysis", icon: PieChart },
+      { href: "/premium/investments", label: "Investments", icon: BarChart },
+      { href: "/premium/planning", label: "Financial Planning", icon: Calculator },
+      { href: "/premium/tax", label: "Tax Optimization", icon: Receipt },
+      { href: "/premium/reports", label: "Premium Reports", icon: FileText }
     ] : []),
 
     { href: "/settings", label: "Settings", icon: Settings }

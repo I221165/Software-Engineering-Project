@@ -8,7 +8,7 @@ const publicRoutes = ['/login', '/register', '/unauthorized'];
 // Define role-based access control
 const roleAccess: Record<string, string[]> = {
   regular: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/loans'],
-  premium: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/premium-features', '/loans'],
+  premium: ['/premium/dashboard', '/premium/portfolio', '/premium/investments', '/premium/planning', '/premium/tax', '/premium/reports', '/settings'],
   admin: ['/admin-dashboard', '/transactions', '/bills', '/savings', '/settings', '/admin', '/loans'],
   bank_manager: ['/dashboard', '/transactions', '/bills', '/savings', '/settings', '/bank', '/loans'],
   loan_distributor: ['/loan-distributor', '/transactions', '/bills', '/savings', '/settings', '/loans'],
@@ -18,7 +18,7 @@ const roleAccess: Record<string, string[]> = {
 // Define role-based dashboard paths
 const roleDashboardPaths: Record<string, string> = {
   regular: '/dashboard',
-  premium: '/dashboard',
+  premium: '/premium/dashboard',
   admin: '/admin-dashboard',
   bank_manager: '/dashboard',
   loan_distributor: '/loan-distributor',

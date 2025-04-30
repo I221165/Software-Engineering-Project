@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { User } from '@/models/User';
+import { Bill } from '@/models/Bill';
+import { Loan } from '@/models/Loan';
+import { Transaction } from '@/models/Transaction';
+import { Savings } from '@/models/Savings';
 
 export async function DELETE(
   request: Request,
@@ -26,11 +30,24 @@ export async function DELETE(
         { status: 403 }
       );
     }
+
+    // Delete all associated data
+    await Promise.all([
+      // Delete all bills
+      Bill.deleteMany({ userId }),
+      // Delete all loans
+      Loan.deleteMany({ userId }),
+      // Delete all transactions
+      Transaction.deleteMany({ userId }),
+      // Delete all savings
+      Savings.deleteMany({ userId })
+    ]);
     
+    // Delete the user
     await User.findByIdAndDelete(userId);
     
     return NextResponse.json(
-      { message: 'User deleted successfully' },
+      { message: 'User and all associated data deleted successfully' },
       { status: 200 }
     );
   } catch (error) {
