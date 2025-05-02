@@ -7,11 +7,11 @@ import { Transaction } from '@/models/Transaction';
 import { Savings } from '@/models/Savings';
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { userId: string } }
+  request: Request, context:
+  { params: { userId: string } }
 ) {
   try {
-    const { userId } = await Promise.resolve(params);
+    const { userId } = await Promise.resolve(context.params);
     
     await connectDB();
     
