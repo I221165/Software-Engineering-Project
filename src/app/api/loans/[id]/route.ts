@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('cookie')?.split('; ')
@@ -27,7 +27,7 @@ export async function PATCH(
 
     await connectDB();
 
-    const { id } = params;
+    const { id } = await params;
     const { status } = await request.json();
 
     // Validate loan ID

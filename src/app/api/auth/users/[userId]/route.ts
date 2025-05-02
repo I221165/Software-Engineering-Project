@@ -7,15 +7,14 @@ import { Transaction } from '@/models/Transaction';
 import { Savings } from '@/models/Savings';
 
 export async function DELETE(
-  request: Request, context:
-  { params: { userId: string } }
+  request: Request,
+  context: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = await Promise.resolve(context.params);
-    
+    const { userId } = await context.params;
+
     await connectDB();
-    
-    // Check if user exists and is not an admin
+
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
@@ -23,7 +22,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    
+
     if (user.role === 'admin') {
       return NextResponse.json(
         { error: 'Cannot delete admin user' },
@@ -31,21 +30,15 @@ export async function DELETE(
       );
     }
 
-    // Delete all associated data
     await Promise.all([
-      // Delete all bills
       Bill.deleteMany({ userId }),
-      // Delete all loans
       Loan.deleteMany({ userId }),
-      // Delete all transactions
       Transaction.deleteMany({ userId }),
-      // Delete all savings
       Savings.deleteMany({ userId })
     ]);
-    
-    // Delete the user
+
     await User.findByIdAndDelete(userId);
-    
+
     return NextResponse.json(
       { message: 'User and all associated data deleted successfully' },
       { status: 200 }
@@ -57,4 +50,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}
